@@ -8,7 +8,8 @@ class Storage {
     async setItem(key, value) {
         await _taiko.evaluate((_, args) => {
             let storage = args.type === 'local' ? localStorage : sessionStorage;
-            return storage.setItem(args.key, JSON.stringify(args.value));
+            let value = typeof args.value === 'object' ? JSON.stringify(args.value) : args.value;
+            return storage.setItem(args.key, value);
         }, { returnByValue: true, args: { type: this.type, key: key, value: value } });
         _descEmitter.emit('success', 'Added "' + key + '" to ' + this.type + ' storage.');
     }
@@ -27,12 +28,13 @@ class Storage {
             return storage.getItem(args.key);
         }, { returnByValue: true, args: { type: this.type, key: key } });
         _descEmitter.emit('success', 'Retrieve value for "' + key + '" from ' + this.type + ' storage.');
+
         try {
-            return JSON.parse(value);
-        } catch (e) {
-             _descEmitter.emit('success', 'Unable to parse value as JSON for "' + key + '" from ' + this.type + ' storage.');
-             return value;
+            value = JSON.parse(value);
         }
+        catch {}
+
+        return value;
     }
 
     async hasItem(key) {
