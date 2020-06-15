@@ -56,6 +56,17 @@ await sessionStorage.setItem(key, value);
 
 ```
 
+### `setItems(key, value)`
+
+set the array of { key, value } to storage
+
+```js
+await localStorage.setItems(items);
+// or
+await sessionStorage.setItems(items);
+
+```
+
 ### `getItem(key)`
 
 featch the value for given key from storage

@@ -14,6 +14,20 @@ class Storage {
         _descEmitter.emit('success', 'Added "' + key + '" to ' + this.type + ' storage.');
     }
 
+    async setItems(items) {
+        await _taiko.evaluate(
+            (_, args) => {
+                let storage = args.type === 'local' ? localStorage : sessionStorage;
+
+                return Promise.all(args.items.map(({ key, value }) => {
+                    let transformedValue = typeof value === 'object' ? JSON.stringify(value) : value;
+                    return storage.setItem(key, transformedValue);
+                }));
+            }, { returnByValue: true, args: { type: this.type, items } 
+        });
+        _descEmitter.emit('success', `Added [${Object.keys(items).map(x => `"${x}"`).join(", ")}] to ${this.type} storage.`);
+    }
+
     async clear() {
         await _taiko.evaluate((_, args) => {
             let storage = args.type === 'local' ? localStorage : sessionStorage;
